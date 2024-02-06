@@ -92,12 +92,12 @@ app.post("/login", (req, res) => {
 // Insert Blog Post API
 // Insert Blog Post API with image upload
 app.post("/insert-blog-post", upload.single("blogimage"), (req, res) => {
-  const { title, content } = req.body;
-  const imagePath = req.file ? req.file.path : null; // Check if a file was uploaded
+  const { title, content, blogimage } = req.body;
+  // const imagePath = req.file ? req.file.path : null; // Check if a file was uploaded
 
   const sql =
     "INSERT INTO blog_posts (title, content, blogimage) VALUES (?, ?, ?)";
-  const values = [title, content, imagePath];
+  const values = [title, content, blogimage];
 
   connection.query(sql, values, (error, results, fields) => {
     if (error) {
@@ -126,14 +126,14 @@ app.get("/fetch-blog-posts", (req, res) => {
 
 // Update Blog Post API
 // Update Blog Post API
-app.put("/update-blog-post/:id", upload.single("blogimage"), (req, res) => {
+app.put("/update-blog-post/:id", (req, res) => {
   const postId = req.params.id;
-  const { title, content } = req.body;
-  const imagePath = req.file ? req.file.path : null;
+  const { title, content, blogimage } = req.body;
+  // const imagePath = req.file ? req.file.path : null;
 
   const sql =
     "UPDATE blog_posts SET title = ?, content = ?, blogimage = ? WHERE post_id = ?";
-  const values = [title, content, imagePath, postId];
+  const values = [title, content, blogimage, postId];
 
   connection.query(sql, values, (error, results, fields) => {
     if (error) {

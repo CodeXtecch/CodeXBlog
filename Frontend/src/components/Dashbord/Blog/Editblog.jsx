@@ -10,6 +10,7 @@ const Editblog = () => {
   const [imageUrl, setImageUrl] = useState("");
   const { postId } = useParams();
   const [error, setError] = useState("");
+  const [imageSrc, setImageSrc] = useState("");
 
   const handleChange = (value) => {
     setContent(value);
@@ -19,42 +20,42 @@ const Editblog = () => {
     setTitle(e.target.value);
   };
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
+  // const handleImageChange = async (e) => {
+  //   const file = e.target.files[0];
 
-    if (file) {
-      try {
-        const data = await uploadImage(file);
-        setImageUrl(data.imageUrl.replace(/\\/g, "/"));
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        setError("Error uploading image");
-      }
-    }
-  };
+  //   if (file) {
+  //     try {
+  //       const data = await uploadImage(file);
+  //       setImageUrl(data.imageUrl.replace(/\\/g, "/"));
+  //     } catch (error) {
+  //       console.error("Error uploading image:", error);
+  //       setError("Error uploading image");
+  //     }
+  //   }
+  // };
 
-  const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append("image", file);
+  // const uploadImage = async (file) => {
+  //   const formData = new FormData();
+  //   formData.append("image", file);
 
-    try {
-      const response = await fetch("http://localhost:3000/upload-image", {
-        method: "POST",
-        body: formData,
-      });
+  //   try {
+  //     const response = await fetch("http://localhost:3000/upload-image", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! Status: ${response.status}`);
+  //     }
 
-      const data = await response.json();
-      console.log("Image Upload Response:", data);
-      return data;
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      throw error;
-    }
-  };
+  //     const data = await response.json();
+  //     console.log("Image Upload Response:", data);
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error uploading image:", error);
+  //     throw error;
+  //   }
+  // };
 
   const handleUpdate = async () => {
     try {
@@ -68,7 +69,7 @@ const Editblog = () => {
           body: JSON.stringify({
             title: title,
             content: content,
-            imageUrl: imageUrl,
+            blogimage: imageSrc,
           }),
         }
       );
@@ -86,31 +87,31 @@ const Editblog = () => {
     }
   };
 
-  const onChange = (e) => {
-    e.preventDefault();
-    const files = e.target.files;
-    const file = files[0];
-    // You can use this function for additional processing if needed
-    getBase64(file);
-  };
-
-  const getBase64 = (file) => {
-    const reader = new FileReader();
+  function getBase64(file) {
+    var reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = function () {
-      console.log(reader.result);
-      // Do something with the base64 data if needed
+      // console.log(reader.result);
+      setImageSrc(reader.result);
+      setError("");
     };
     reader.onerror = function (error) {
       console.log("Error: ", error);
+      setError(error);
     };
+  }
+
+  const handleImageChange = (e) => {
+    e.preventDefault();
+    // console.log(e.target.files);
+    const files = e.target.files;
+    const file = files[0];
+    getBase64(file);
   };
 
-  const [imageSrc, setImageSrc] = useState("");
-
-  useEffect(() => {
-    setImageSrc(`http://localhost:3000/${imageUrl}`);
-  }, [imageUrl]);
+  // useEffect(() => {
+  //   setImageSrc(`http://localhost:3000/${imageUrl}`);
+  // }, [imageUrl]);
 
   useEffect(() => {
     const fetchBlogPost = async () => {
@@ -128,6 +129,7 @@ const Editblog = () => {
 
         setTitle(data.title);
         setContent(data.content);
+        setImageSrc(data.blogimage);
 
         if (data.blogimage) {
           setImageUrl(data.blogimage.replace(/\\/g, "/"));
